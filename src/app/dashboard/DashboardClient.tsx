@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { Pie } from 'react-chartjs-2'
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
 import { ThemeToggle } from '../../components/ThemeToggle'
+import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
 Chart.register(ArcElement, Tooltip, Legend)
 
 const DeviceMap = dynamic(() => import('./DeviceMap'), { ssr: false })
@@ -14,7 +15,7 @@ interface DashboardClientProps {
   devices: Device[]
 }
 
-type SortKey = 'name' | 'status'
+type SortKey = 'name' | 'status' | 'type'
 type SortOrder = 'asc' | 'desc'
 
 function getStatusLabel(status: string) {
@@ -92,6 +93,10 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
         const bVal = statusOrder[b.status?.toUpperCase() as keyof typeof statusOrder] || 99
         return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
       }
+      if (sortKey === 'type') {
+        const cmp = (a.type || '').localeCompare(b.type || '', 'fr', { sensitivity: 'base' })
+        return sortOrder === 'asc' ? cmp : -cmp
+      }
       return 0
     })
     return arr
@@ -142,7 +147,7 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 bg-background">
-        <div className="text-2xl font-bold tracking-tight">LinkAfric Monitoring</div>
+        <div className="text-2xl font-bold tracking-tight">Monitoring réseau monétique</div>
         <ThemeToggle />
       </header>
       {/* Navbar */}
@@ -159,11 +164,11 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
         <section className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <button
-              className={`px-3 py-1 rounded-l border ${view === 'table' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+              className={`px-3 py-1 rounded-l border cursor-pointer ${view === 'table' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
               onClick={() => setView('table')}
             >Table</button>
             <button
-              className={`px-3 py-1 rounded-r border-l-0 border ${view === 'map' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+              className={`px-3 py-1 rounded-r border-l-0 border cursor-pointer ${view === 'map' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
               onClick={() => setView('map')}
             >Carte</button>
             <input
@@ -184,18 +189,35 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
               <table className="min-w-full text-sm">
                 <thead className="bg-zinc-100 dark:bg-zinc-800">
                   <tr>
-                    <th className="px-3 py-2 text-left whitespace-nowrap cursor-pointer" onClick={() => handleSort('name')}>
+                    <th className="px-3 py-2 text-left whitespace-nowrap cursor-pointer select-none" onClick={() => handleSort('name')}>
                       Nom
-                      <span className="inline-block ml-1 align-middle select-none">
-                        {sortKey === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : <span className="opacity-30">↕</span>}
+                      <span className="inline-block ml-1 align-middle">
+                        {sortKey === 'name' ? (
+                          sortOrder === 'asc' ? <ArrowUp className="w-4 h-4 text-primary" /> : <ArrowDown className="w-4 h-4 text-primary" />
+                        ) : (
+                          <ChevronsUpDown className="w-4 h-4 text-muted-foreground" />
+                        )}
                       </span>
                     </th>
-                    <th className="px-3 py-2 text-left whitespace-nowrap">Type</th>
+                    <th className="px-3 py-2 text-left whitespace-nowrap cursor-pointer select-none" onClick={() => handleSort('type')}>
+                      Type
+                      <span className="inline-block ml-1 align-middle">
+                        {sortKey === 'type' ? (
+                          sortOrder === 'asc' ? <ArrowUp className="w-4 h-4 text-primary" /> : <ArrowDown className="w-4 h-4 text-primary" />
+                        ) : (
+                          <ChevronsUpDown className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </span>
+                    </th>
                     <th className="px-3 py-2 text-left whitespace-nowrap">IP</th>
-                    <th className="px-3 py-2 text-left whitespace-nowrap cursor-pointer" onClick={() => handleSort('status')}>
+                    <th className="px-3 py-2 text-left whitespace-nowrap cursor-pointer select-none" onClick={() => handleSort('status')}>
                       Statut
-                      <span className="inline-block ml-1 align-middle select-none">
-                        {sortKey === 'status' ? (sortOrder === 'asc' ? '▲' : '▼') : <span className="opacity-30">↕</span>}
+                      <span className="inline-block ml-1 align-middle">
+                        {sortKey === 'status' ? (
+                          sortOrder === 'asc' ? <ArrowUp className="w-4 h-4 text-primary" /> : <ArrowDown className="w-4 h-4 text-primary" />
+                        ) : (
+                          <ChevronsUpDown className="w-4 h-4 text-muted-foreground" />
+                        )}
                       </span>
                     </th>
                     <th className="px-3 py-2 text-left whitespace-nowrap">Dernier contact OK</th>
