@@ -1,5 +1,6 @@
 import { Device } from '../../types/device'
 import { DashboardClient } from './DashboardClient'
+import { AuthGuard } from '../../components/AuthGuard'
 
 async function fetchDevices(): Promise<Device[]> {
   const res = await fetch('https://monitor.linkafric.com/api/devices', {
@@ -13,5 +14,9 @@ async function fetchDevices(): Promise<Device[]> {
 
 export default async function Page() {
   const devices = await fetchDevices()
-  return <DashboardClient devices={devices} />
+  return (
+    <AuthGuard>
+      <DashboardClient devices={devices} />
+    </AuthGuard>
+  )
 } 

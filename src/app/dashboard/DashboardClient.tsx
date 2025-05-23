@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { Pie } from 'react-chartjs-2'
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
 import { ThemeToggle } from '../../components/ThemeToggle'
+import { LogoutButton } from '../../components/LogoutButton'
 import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
 Chart.register(ArcElement, Tooltip, Legend)
 
@@ -148,7 +149,10 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 bg-background">
         <div className="text-2xl font-bold tracking-tight">Monitoring réseau monétique</div>
-        <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <LogoutButton />
+          <ThemeToggle />
+        </div>
       </header>
       {/* Navbar */}
       <nav className="px-6 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-background text-sm flex gap-4">
