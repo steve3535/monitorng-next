@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build
+.next
+out
+
+# Misc
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+
+# Local env files
+.env*.local 
