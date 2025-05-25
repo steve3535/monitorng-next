@@ -29,7 +29,7 @@ function getMarkerIcon(status: Device['status'] | string) {
 }
 
 // Dispersion légère autour de Lomé
-function getCoords(device: Device, idx: number): [number, number] {
+function getCoords(device: Device): [number, number] {
   if (device.coordinates && device.coordinates.length === 2) return device.coordinates
   // Génère un point aléatoire dans Lomé (zone urbaine)
   const lat = 6.10 + Math.random() * 0.08 // 6.10 à 6.18
@@ -53,10 +53,10 @@ export default function DeviceMap({ devices }: { devices: Device[] }) {
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
-        {devices.map((device, idx) => (
+        {devices.map((device) => (
           <Marker
             key={device.id}
-            position={getCoords(device, idx)}
+            position={getCoords(device)}
             icon={getMarkerIcon(device.status)}
           >
             <Popup>

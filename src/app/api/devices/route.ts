@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const res = await fetch('https://monitor.linkafric.com/api/devices', {
     headers: { 'x-api-key': 'P@ssNtc202!' },
     cache: 'no-store'

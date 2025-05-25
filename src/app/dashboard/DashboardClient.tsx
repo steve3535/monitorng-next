@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useMemo, useEffect, Suspense } from 'react'
+import { useState, useMemo, Suspense } from 'react'
 import { Device } from '../../types/device'
 import dynamic from 'next/dynamic'
 import { Pie } from 'react-chartjs-2'
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { LogoutButton } from '../../components/LogoutButton'
+import { DeviceFilters } from '../../components/dashboard/DeviceFilters'
+import { useDevicePolling } from '../../hooks/useDevicePolling'
 import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
 Chart.register(ArcElement, Tooltip, Legend)
 
@@ -42,39 +44,11 @@ function formatDate(date?: string) {
 const statusOrder = { 'UP': 1, 'FLAPPING': 2, 'DOWN': 3 }
 
 export function DashboardClient({ devices: initialDevices }: DashboardClientProps) {
-  const [devices, setDevices] = useState<Device[]>(initialDevices)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const { devices, isLoading, hasError } = useDevicePolling(initialDevices)
   const [search, setSearch] = useState('')
   const [view, setView] = useState<'table' | 'map'>('table')
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
-
-  // Polling toutes les 60s
-  useEffect(() => {
-    let isMounted = true
-    async function fetchDevices() {
-      setIsLoading(true)
-      setHasError(false)
-      try {
-        const res = await fetch('/api/devices', {
-          cache: 'no-store'
-        })
-        if (!res.ok) throw new Error('Failed to fetch devices')
-        const data = await res.json()
-        if (isMounted && data.devices) setDevices(data.devices)
-      } catch {
-        if (isMounted) setHasError(true)
-      } finally {
-        if (isMounted) setIsLoading(false)
-      }
-    }
-    const interval = setInterval(fetchDevices, 60000)
-    return () => {
-      isMounted = false
-      clearInterval(interval)
-    }
-  }, [])
 
   const filtered = useMemo(() =>
     devices.filter(d =>
@@ -166,22 +140,12 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
       <main className="flex flex-col md:flex-row gap-6 px-4 md:px-8 py-6">
         {/* Left: Table/Map */}
         <section className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              className={`px-3 py-1 rounded-l border cursor-pointer ${view === 'table' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
-              onClick={() => setView('table')}
-            >Table</button>
-            <button
-              className={`px-3 py-1 rounded-r border-l-0 border cursor-pointer ${view === 'map' ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800'}`}
-              onClick={() => setView('map')}
-            >Carte</button>
-            <input
-              className="ml-auto px-2 py-1 rounded border bg-background text-foreground w-48"
-              placeholder="Recherche nom ou IP..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
+          <DeviceFilters
+            search={search}
+            onSearchChange={setSearch}
+            view={view}
+            onViewChange={setView}
+          />
           {hasError && (
             <div className="mb-2 text-red-600 text-sm">Erreur lors du chargement des données.</div>
           )}
