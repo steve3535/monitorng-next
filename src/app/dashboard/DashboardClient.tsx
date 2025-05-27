@@ -3,14 +3,12 @@
 import { useState, useMemo, Suspense } from 'react'
 import { Device } from '../../types/device'
 import dynamic from 'next/dynamic'
-import { Pie } from 'react-chartjs-2'
-import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
+import { ModernPieChart } from '../../components/dashboard/ModernPieChart'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { LogoutButton } from '../../components/LogoutButton'
 import { DeviceFilters } from '../../components/dashboard/DeviceFilters'
 import { useDevicePolling } from '../../hooks/useDevicePolling'
 import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
-Chart.register(ArcElement, Tooltip, Legend)
 
 const DeviceMap = dynamic(() => import('./DeviceMap'), { ssr: false })
 
@@ -83,32 +81,6 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
     const flapping = devices.filter(d => d.status?.toUpperCase() === 'FLAPPING').length
     return { up, down, flapping }
   }, [devices])
-
-  const pieData = useMemo(() => ({
-    labels: ['En ligne', 'Hors ligne', 'Instable'],
-    datasets: [
-      {
-        data: [stats.up, stats.down, stats.flapping],
-        backgroundColor: [
-          '#22c55e', // green-500
-          '#ef4444', // red-500
-          '#eab308'  // yellow-500
-        ],
-        borderColor: [
-          '#14532d', // green-900
-          '#7f1d1d', // red-900
-          '#78350f'  // yellow-900
-        ],
-        borderWidth: 2
-      }
-    ]
-  }), [stats])
-
-  const pieLegend = [
-    { label: 'En ligne', color: 'bg-green-500' },
-    { label: 'Hors ligne', color: 'bg-red-500' },
-    { label: 'Instable', color: 'bg-yellow-500' }
-  ]
 
   function handleSort(key: SortKey) {
     if (sortKey === key) setSortOrder(order => order === 'asc' ? 'desc' : 'asc')
@@ -213,43 +185,41 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
           )}
         </section>
         {/* Right: Stats */}
-        <aside className="w-full md:w-1/3 flex-shrink-0 bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow border border-zinc-200 dark:border-zinc-700 p-6 flex flex-col gap-6">
-          <div>
-            <div className="text-lg font-bold mb-1">Statistiques</div>
-            <div className="flex gap-4 text-sm items-center">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span> {stats.up} en ligne</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> {stats.down} hors ligne</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span> {stats.flapping} instables</span>
+        <aside className="w-full md:w-1/3 flex-shrink-0 space-y-6">
+          {/* Quick Stats */}
+          <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow border border-zinc-200 dark:border-zinc-700 p-6">
+            <div className="text-lg font-bold mb-3">Statistiques</div>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                <span>{stats.up} en ligne</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                <span>{stats.down} hors ligne</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span>{stats.flapping} instables</span>
+              </span>
             </div>
           </div>
-          <div>
-            <div className="font-semibold mb-1 text-sm">Hors ligne :</div>
-            <ul className="text-xs text-red-600 space-y-1">
+
+          {/* Offline Devices */}
+          <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow border border-zinc-200 dark:border-zinc-700 p-6">
+            <div className="font-semibold mb-3 text-sm">Appareils hors ligne :</div>
+            <ul className="text-xs text-red-600 space-y-1 max-h-32 overflow-y-auto">
               {devices.filter(d => d.status?.toUpperCase() === 'DOWN').map(d => (
-                <li key={d.id}>{d.name} ({d.ip_address})</li>
+                <li key={d.id} className="break-all">{d.name} ({d.ip_address})</li>
               ))}
-              {devices.filter(d => d.status?.toUpperCase() === 'DOWN').length === 0 && <li className="text-zinc-400">Aucun</li>}
+              {devices.filter(d => d.status?.toUpperCase() === 'DOWN').length === 0 && 
+                <li className="text-zinc-400">Aucun appareil hors ligne</li>
+              }
             </ul>
           </div>
-          <div className="mt-2">
-            <div className="font-semibold text-sm mb-1">Répartition</div>
-            <div className="w-full h-48 flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800 rounded">
-              <Pie data={pieData} options={{
-                plugins: {
-                  legend: { display: false },
-                },
-                maintainAspectRatio: false
-              }} />
-              <div className="flex gap-4 mt-2">
-                {pieLegend.map(l => (
-                  <span key={l.label} className="flex items-center gap-1 text-xs">
-                    <span className={`w-3 h-3 rounded-full inline-block ${l.color}`}></span>
-                    {l.label}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+
+          {/* Modern Pie Chart */}
+          <ModernPieChart data={stats} />
         </aside>
       </main>
     </div>
