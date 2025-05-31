@@ -200,20 +200,20 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
               </span>
               <span className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-                <span>{stats.flapping} instables</span>
+                <span>{stats.flapping} instable(s)</span>
               </span>
             </div>
           </div>
 
           {/* Offline Devices */}
           <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow border border-zinc-200 dark:border-zinc-700 p-6">
-            <div className="font-semibold mb-3 text-sm">Appareils hors ligne :</div>
+            <div className="font-semibold mb-3 text-sm">Site(s) hors ligne :</div>
             <ul className="text-xs text-red-600 space-y-1 max-h-32 overflow-y-auto">
               {devices.filter(d => d.status?.toUpperCase() === 'DOWN').map(d => (
                 <li key={d.id} className="break-all">{d.name} ({d.ip_address})</li>
               ))}
               {devices.filter(d => d.status?.toUpperCase() === 'DOWN').length === 0 && 
-                <li className="text-zinc-400">Aucun appareil hors ligne</li>
+                <li className="text-zinc-400">Aucun site hors ligne</li>
               }
             </ul>
           </div>

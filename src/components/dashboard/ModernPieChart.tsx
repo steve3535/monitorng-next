@@ -36,6 +36,12 @@ export function ModernPieChart({ data, className }: PieChartProps) {
   const strokeWidth = 16
   const circumference = 2 * Math.PI * radius
 
+  // Trigger animation on mount - must be called before any early returns
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsAnimated(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
   const segments = useMemo((): ChartSegment[] => {
     if (total === 0) return []
 
@@ -88,34 +94,28 @@ export function ModernPieChart({ data, className }: PieChartProps) {
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Activity className="w-5 h-5" />
-            Répartition des appareils
+            Répartition des site(s)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center h-64 text-muted-foreground space-y-3">
             <div className="w-16 h-16 rounded-full border-4 border-border animate-pulse bg-muted/20"></div>
-            <div className="text-sm">Aucun appareil détecté</div>
+            <div className="text-sm">Aucun site détecté</div>
           </div>
         </CardContent>
       </Card>
     )
   }
 
-  // Trigger animation on mount
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsAnimated(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
-
   return (
     <Card className={cn("w-full transition-all duration-300 hover:shadow-lg", className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Activity className="w-5 h-5" />
-          Répartition des appareils
+          Répartition des sites
         </CardTitle>
         <div className="text-sm text-muted-foreground">
-          {total} appareil{total > 1 ? 's' : ''} au total
+          {total} site{total > 1 ? 's' : ''} au total
         </div>
       </CardHeader>
       <CardContent>
@@ -140,7 +140,7 @@ export function ModernPieChart({ data, className }: PieChartProps) {
               />
               
               {/* Animated segments */}
-              {segments.map((segment, index) => (
+              {segments.map((segment) => (
                 <circle
                   key={segment.label}
                   cx="110"
@@ -169,7 +169,7 @@ export function ModernPieChart({ data, className }: PieChartProps) {
               <div className="text-3xl font-bold text-foreground transition-all duration-300 group-hover:scale-110">
                 {total}
               </div>
-              <div className="text-sm text-muted-foreground">appareils</div>
+              <div className="text-sm text-muted-foreground">site(s)</div>
             </div>
           </div>
 

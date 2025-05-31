@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Generator</title>
+</head>
+<body>
+    <h2>EagleView Favicon Generator</h2>
+    <canvas id="canvas" width="32" height="32" style="border: 1px solid #ccc; image-rendering: pixelated; width: 128px; height: 128px;"></canvas>
+    <br><br>
+    <button onclick="generateFavicon()">Generate Blue E Favicon</button>
+    <br><br>
+    <a id="downloadLink" style="display: none;">Download favicon.ico</a>
+
+    <script>
+        function generateFavicon() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, 32, 32);
+            
+            // Set background to transparent
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, 32, 32);
+            
+            // Draw blue "E" letter
+            ctx.fillStyle = '#2563eb'; // Blue-600
+            ctx.font = 'bold 24px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Add a subtle shadow/depth
+            ctx.shadowColor = '#1e40af'; // Blue-800
+            ctx.shadowBlur = 1;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            // Draw the "E"
+            ctx.fillText('E', 16, 16);
+            
+            // Convert to blob and create download link
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.getElementById('downloadLink');
+                link.href = url;
+                link.download = 'favicon.ico';
+                link.style.display = 'inline';
+                link.textContent = 'Download favicon.ico';
+            }, 'image/png');
+        }
+        
+        // Auto-generate on load
+        window.onload = generateFavicon;
+    </script>
+</body>
+</html> 

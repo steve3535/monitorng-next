@@ -5,7 +5,7 @@ FROM node:18-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production --omit=dev
 
 # 2. Build the app
 FROM base AS builder
@@ -40,5 +40,5 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-
+EXPOSE ${PORT}
 CMD ["node", "server.js"] 
