@@ -41,16 +41,17 @@ export default function DeviceMap({ devices }: { devices: Device[] }) {
   // Centre sur Lomé
   const center: [number, number] = [6.1319, 1.2228]
   return (
-    <div className="w-full h-[500px] md:h-[650px] rounded-lg overflow-hidden shadow border border-zinc-200 dark:border-zinc-700">
+    <div className="w-full h-[500px] md:h-[650px] rounded-lg overflow-hidden shadow border border-zinc-200 dark:border-zinc-700 relative">
       <MapContainer
         center={center}
         zoom={12}
         minZoom={10}
         maxZoom={16}
+        attributionControl={false}
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+          attribution=""
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         {devices.map((device) => (
@@ -67,6 +68,16 @@ export default function DeviceMap({ devices }: { devices: Device[] }) {
           </Marker>
         ))}
       </MapContainer>
+      
+      {/* Custom styling to ensure clean appearance */}
+      <style jsx>{`
+        :global(.leaflet-control-attribution) {
+          display: none !important;
+        }
+        :global(.leaflet-bottom.leaflet-right) {
+          display: none !important;
+        }
+      `}</style>
     </div>
   )
 } 
