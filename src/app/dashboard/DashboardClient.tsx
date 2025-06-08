@@ -41,37 +41,6 @@ function formatDate(date?: string) {
 
 const statusOrder = { 'UP': 1, 'FLAPPING': 2, 'DOWN': 3 }
 
-function getBackboneStatusColor(status: string) {
-  if (status?.toUpperCase() === 'UP') return 'bg-green-200 text-green-800 border-green-400';
-  if (status?.toUpperCase() === 'DOWN') return 'bg-red-200 text-red-800 border-red-400';
-  if (status?.toUpperCase() === 'FLAPPING') return 'bg-yellow-100 text-yellow-800 border-yellow-400';
-  return 'bg-zinc-200 text-zinc-700 border-zinc-400';
-}
-
-function BackboneCard({ label, device }: { label: string, device?: Device }) {
-  if (!device) return (
-    <div className="rounded-lg border p-4 mb-4 bg-gray-100">
-      <span className="font-bold">{label}</span>
-      <span className="ml-4 text-gray-500">Non trouvé</span>
-    </div>
-  )
-  return (
-    <div className={`rounded-lg border-2 p-4 mb-4 flex items-center justify-between shadow-md ${getBackboneStatusColor(device.status)}`}> 
-      <div>
-        <span className="font-bold text-lg">{label}</span>
-        <span className="ml-4 font-mono">{device.name}</span>
-      </div>
-      <div className="flex items-center">
-        <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBackboneStatusColor(device.status).split(' ')[0]}`}></span>
-        <span className="font-semibold uppercase">{getStatusLabel(device.status)}</span>
-        {device.response_time && (
-          <span className="ml-4 text-sm">Latence: {device.response_time} ms</span>
-        )}
-      </div>
-    </div>
-  )
-}
-
 function StatusIndicator({ status }: { status: string }) {
   if (status?.toUpperCase() === 'UP') {
     return (
