@@ -8,7 +8,7 @@ import { ThemeToggle } from '../../components/ThemeToggle'
 import { LogoutButton } from '../../components/LogoutButton'
 import { DeviceFilters } from '../../components/dashboard/DeviceFilters'
 import { useDevicePolling } from '../../hooks/useDevicePolling'
-import { ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
+import { ArrowUp, ArrowDown, ChevronsUpDown, HeartPulse, AlertTriangle } from 'lucide-react'
 
 const DeviceMap = dynamic(() => import('./DeviceMap'), { ssr: false })
 
@@ -41,6 +41,65 @@ function formatDate(date?: string) {
 
 const statusOrder = { 'UP': 1, 'FLAPPING': 2, 'DOWN': 3 }
 
+function getBackboneStatusColor(status: string) {
+  if (status?.toUpperCase() === 'UP') return 'bg-green-200 text-green-800 border-green-400';
+  if (status?.toUpperCase() === 'DOWN') return 'bg-red-200 text-red-800 border-red-400';
+  if (status?.toUpperCase() === 'FLAPPING') return 'bg-yellow-100 text-yellow-800 border-yellow-400';
+  return 'bg-zinc-200 text-zinc-700 border-zinc-400';
+}
+
+function BackboneCard({ label, device }: { label: string, device?: Device }) {
+  if (!device) return (
+    <div className="rounded-lg border p-4 mb-4 bg-gray-100">
+      <span className="font-bold">{label}</span>
+      <span className="ml-4 text-gray-500">Non trouvé</span>
+    </div>
+  )
+  return (
+    <div className={`rounded-lg border-2 p-4 mb-4 flex items-center justify-between shadow-md ${getBackboneStatusColor(device.status)}`}> 
+      <div>
+        <span className="font-bold text-lg">{label}</span>
+        <span className="ml-4 font-mono">{device.name}</span>
+      </div>
+      <div className="flex items-center">
+        <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBackboneStatusColor(device.status).split(' ')[0]}`}></span>
+        <span className="font-semibold uppercase">{getStatusLabel(device.status)}</span>
+        {device.response_time && (
+          <span className="ml-4 text-sm">Latence: {device.response_time} ms</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function StatusIndicator({ status }: { status: string }) {
+  if (status?.toUpperCase() === 'UP') {
+    return (
+      <span className="flex items-center gap-1 text-green-700">
+        <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+        <HeartPulse className="w-4 h-4 inline-block" />
+        <span>En ligne</span>
+      </span>
+    )
+  }
+  if (status?.toUpperCase() === 'DOWN') {
+    return (
+      <span className="flex items-center gap-1 text-red-700">
+        <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+        <AlertTriangle className="w-4 h-4 inline-block" />
+        <span>Hors ligne</span>
+      </span>
+    )
+  }
+  return (
+    <span className="flex items-center gap-1 text-yellow-700">
+      <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+      <HeartPulse className="w-4 h-4 inline-block" />
+      <span>Instable</span>
+    </span>
+  )
+}
+
 export function DashboardClient({ devices: initialDevices }: DashboardClientProps) {
   const { devices, isLoading, hasError } = useDevicePolling(initialDevices)
   const [search, setSearch] = useState('')
@@ -48,10 +107,17 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 
+  // Identify backbone lines by name
+  const fibre = devices.find(d => d.name?.toLowerCase().includes('fibre'))
+  const blr = devices.find(d => d.name?.toLowerCase().includes('yas togo'))
+
+  // Exclude backbone lines from the main table
   const filtered = useMemo(() =>
     devices.filter(d =>
-      d.name?.toLowerCase().includes(search.toLowerCase()) ||
-      d.ip_address?.includes(search)
+      !d.name?.toLowerCase().includes('fibre') &&
+      !d.name?.toLowerCase().includes('blr') &&
+      (d.name?.toLowerCase().includes(search.toLowerCase()) ||
+        d.ip_address?.includes(search))
     ), [devices, search])
 
   const sorted = useMemo(() => {
@@ -205,16 +271,22 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
             </div>
           </div>
 
-          {/* Offline Devices */}
+          {/* Backbone Links Section */}
           <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow border border-zinc-200 dark:border-zinc-700 p-6">
-            <div className="font-semibold mb-3 text-sm">Site(s) hors ligne :</div>
-            <ul className="text-xs text-red-600 space-y-1 max-h-32 overflow-y-auto">
-              {devices.filter(d => d.status?.toUpperCase() === 'DOWN').map(d => (
-                <li key={d.id} className="break-all">{d.name} ({d.ip_address})</li>
-              ))}
-              {devices.filter(d => d.status?.toUpperCase() === 'DOWN').length === 0 && 
-                <li className="text-zinc-400">Aucun site hors ligne</li>
-              }
+            <div className="font-semibold mb-3 text-sm">Liaisons backbone :</div>
+            <ul className="text-xs space-y-2">
+              <li className="flex gap-4 items-center">
+                <span className="font-bold text-blue-700 min-w-[220px]">LIAISON BACKBONE PRINCIPALE</span>
+                <div className="flex items-center gap-1 min-w-[120px]">
+                  <StatusIndicator status={fibre?.status || ''} />
+                </div>
+              </li>
+              <li className="flex gap-4 items-center">
+                <span className="font-bold text-purple-700 min-w-[220px]">LIAISON BACKBONE SECONDAIRE</span>
+                <div className="flex items-center gap-1 min-w-[120px]">
+                  <StatusIndicator status={blr?.status || ''} />
+                </div>
+              </li>
             </ul>
           </div>
 
