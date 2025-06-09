@@ -9,6 +9,7 @@ import { LogoutButton } from '../../components/LogoutButton'
 import { DeviceFilters } from '../../components/dashboard/DeviceFilters'
 import { useDevicePolling } from '../../hooks/useDevicePolling'
 import { ArrowUp, ArrowDown, ChevronsUpDown, HeartPulse, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 
 const DeviceMap = dynamic(() => import('./DeviceMap'), { ssr: false })
 
@@ -137,11 +138,11 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
       </header>
       {/* Navbar */}
       <nav className="px-6 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-background text-sm flex gap-4">
-        <span className="font-semibold text-primary">Dashboard</span>
+        <Link href="/dashboard" className="font-semibold text-primary">Dashboard</Link>
         <span className="text-zinc-400">|</span>
-        <span className="text-zinc-500">Rapports</span>
+        <Link href="/analytics" className="text-zinc-500 hover:text-primary transition-colors">Analytics</Link>
         <span className="text-zinc-400">|</span>
-        <span className="text-zinc-500">Alertes</span>
+        <Link href="/alertes" className="text-zinc-500 hover:text-primary transition-colors">Alertes</Link>
       </nav>
       {/* Main split */}
       <main className="flex flex-col md:flex-row gap-6 px-4 md:px-8 py-6">
