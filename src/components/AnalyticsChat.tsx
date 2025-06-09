@@ -29,7 +29,7 @@ export function AnalyticsChat() {
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
       setMessages(msgs => [...msgs, { role: 'ai', content: data.answer }])
-    } catch (err: any) {
+    } catch {
       setError('Erreur lors de la requête. Veuillez réessayer.')
     } finally {
       setIsLoading(false)
@@ -45,7 +45,7 @@ export function AnalyticsChat() {
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-zinc-400 mt-8 text-sm">Aucune question posée pour l'instant.</div>
+          <div className="text-center text-zinc-400 mt-8 text-sm">Aucune question posée pour l&apos;instant.</div>
         )}
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
