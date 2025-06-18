@@ -23,10 +23,10 @@ export function AnalyticsChat() {
     setError(null)
     setInput('')
     try {
-      const res = await fetch('/api/analytics-chat', {
+      const res = await fetch('/api/rag-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: input, history: newMessages })
+        body: JSON.stringify({ question: input })
       })
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
@@ -40,10 +40,10 @@ export function AnalyticsChat() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col h-[60vh] border rounded-lg shadow bg-card border-zinc-200 dark:border-zinc-700">
+    <div className="w-full max-w-md mx-auto flex flex-col h-[60vh] border rounded-lg shadow bg-card border-zinc-200 dark:border-zinc-700">
       <div className="px-4 pt-4 pb-2 border-b border-zinc-200 dark:border-zinc-700">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Chat Analytics</h2>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Posez une question sur vos données réseau…</p>
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Chat</h2>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">Posez n'importe quelle question sur vos données réseau…</p>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
@@ -61,21 +61,21 @@ export function AnalyticsChat() {
         )}
         <div ref={chatEndRef} />
       </div>
-      <form onSubmit={sendMessage} className="p-3 border-t flex gap-2 bg-zinc-50 dark:bg-zinc-900">
+      <form onSubmit={sendMessage} className="p-3 border-t flex gap-2 bg-zinc-50 dark:bg-zinc-900 items-center">
         <input
           type="text"
           className="flex-1 rounded border px-3 py-2 focus:outline-none focus:ring focus:border-primary text-sm bg-background"
           placeholder="Votre question…"
           value={input}
           onChange={e => setInput(e.target.value)}
-          disabled={isLoading}
         />
         <button
           type="submit"
-          className="bg-primary text-primary-foreground px-4 py-2 rounded font-semibold disabled:opacity-50 text-sm"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded font-semibold disabled:opacity-50 text-sm mr-1 flex items-center justify-center"
           disabled={isLoading || !input.trim()}
+          aria-label="Envoyer"
         >
-          Envoyer
+          <span className="text-lg">↑</span>
         </button>
       </form>
       {error && <div className="text-red-600 text-xs text-center p-2">{error}</div>}

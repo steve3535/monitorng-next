@@ -140,7 +140,7 @@ export function DashboardClient({ devices: initialDevices }: DashboardClientProp
       <nav className="px-6 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-background text-sm flex gap-4">
         <Link href="/dashboard" className="font-semibold text-primary">Dashboard</Link>
         <span className="text-zinc-400">|</span>
-        <Link href="/analytics" className="text-zinc-500 hover:text-primary transition-colors">Analytics</Link>
+        <Link href="/analytics" className="text-zinc-500 hover:text-primary transition-colors">Analyses</Link>
         <span className="text-zinc-400">|</span>
         <Link href="/alertes" className="text-zinc-500 hover:text-primary transition-colors">Alertes</Link>
       </nav>
