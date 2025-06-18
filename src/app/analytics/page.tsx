@@ -2,6 +2,7 @@ import { AnalyticsChat } from '../../components/AnalyticsChat'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { LogoutButton } from '../../components/LogoutButton'
 import AnalyticsNavbar from '../../components/AnalyticsNavbar'
+import { NatTransactionsChart } from '../../components/analytics/NatTransactionsChart'
 
 export default function AnalyticsPage() {
   return (
@@ -18,11 +19,9 @@ export default function AnalyticsPage() {
       <AnalyticsNavbar />
       {/* Main split */}
       <main className="flex flex-col md:flex-row gap-6 px-4 md:px-8 py-6 max-w-7xl mx-auto">
-        {/* Left: Graphs/Diagrams placeholder */}
+        {/* Left: Graphs/Diagrams */}
         <section className="flex-1 min-w-0 bg-card rounded-lg border border-zinc-200 dark:border-zinc-700 p-6 mr-0 md:mr-4">
-          <div className="h-full flex items-center justify-center text-zinc-400 text-lg">
-            {/* (Ici, vos graphiques et diagrammes seront affichés) */}
-          </div>
+          <NatTransactionsChart />
         </section>
         {/* Right: Analytics Chat */}
         <aside className="w-full md:w-1/4 flex-shrink-0">

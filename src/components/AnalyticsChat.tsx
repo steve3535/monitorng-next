@@ -16,7 +16,9 @@ export function AnalyticsChat() {
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()
     if (!input.trim()) return
-    setMessages(msgs => [...msgs, { role: 'user', content: input }])
+    const userMessage: ChatMessage = { role: 'user', content: input }
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
     setIsLoading(true)
     setError(null)
     setInput('')
@@ -24,7 +26,7 @@ export function AnalyticsChat() {
       const res = await fetch('/api/analytics-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: input })
+        body: JSON.stringify({ question: input, history: newMessages })
       })
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()

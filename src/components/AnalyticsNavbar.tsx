@@ -26,7 +26,7 @@ export default function AnalyticsNavbar() {
             : 'text-zinc-500 hover:text-primary transition-colors'
         }
       >
-        Analytics
+        Analyses
       </Link>
       <span className="text-zinc-400">|</span>
       <Link
