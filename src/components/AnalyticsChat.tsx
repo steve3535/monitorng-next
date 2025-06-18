@@ -43,7 +43,7 @@ export function AnalyticsChat() {
     <div className="w-full max-w-md mx-auto flex flex-col h-[60vh] border rounded-lg shadow bg-card border-zinc-200 dark:border-zinc-700">
       <div className="px-4 pt-4 pb-2 border-b border-zinc-200 dark:border-zinc-700">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Chat</h2>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Posez n'importe quelle question sur vos données réseau…</p>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">Posez n&apos;importe quelle question sur vos données réseau…</p>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
