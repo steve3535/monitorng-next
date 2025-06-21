@@ -79,8 +79,8 @@ const redGradients = [
   '#fb7185', '#fda4af', '#fecdd3', '#7f1d1d', '#9f1239', '#881337', '#fbbf24', '#f59e42', '#f87171', '#f43f5e',
 ];
 
-function formatDateFR(date: Date): string {
-  return date.toLocaleDateString('fr-FR');
+function formatDateUTC(date: Date): string {
+  return date.toLocaleDateString('fr-FR', { timeZone: 'UTC' });
 }
 
 export function NatTransactionsChart() {
@@ -90,6 +90,9 @@ export function NatTransactionsChart() {
   const [hasError, setHasError] = useState(false);
   const histogramTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Get the current time in UTC to use for all comparisons
+  const nowUTC = new Date().getTime();
+
   // Top 10 chart: refresh every 60s
   const fetchTop10 = useCallback(async () => {
     setIsLoading(true);
@@ -98,9 +101,8 @@ export function NatTransactionsChart() {
       const res = await fetch('https://monitor.linkafric.com/api/nat_tpe_fusion');
       const json = await res.json();
       const txs: NatFusion[] = json.data || [];
-      const now = Date.now();
-      // Top 10 for current day only
-      const txsToday = txs.filter(tx => tx.point_de_vente && tx.point_de_vente.trim() !== "" && isSameDay(parseTimestamp(tx.timestamp), now));
+      // Top 10 for current day only, compared against a stable UTC timestamp
+      const txsToday = txs.filter(tx => tx.point_de_vente && tx.point_de_vente.trim() !== "" && isSameDay(parseTimestamp(tx.timestamp), nowUTC));
       const countsToday = countDistinctTransactions(txsToday);
       const chartData = Object.entries(countsToday)
         .map(([site, count]) => ({ site, count }))
@@ -120,9 +122,8 @@ export function NatTransactionsChart() {
       const res = await fetch('https://monitor.linkafric.com/api/nat_tpe_fusion');
       const json = await res.json();
       const txs: NatFusion[] = json.data || [];
-      const now = Date.now();
-      // Histogram for last 7 days (cumulative)
-      const txs7d = txs.filter(tx => tx.point_de_vente && tx.point_de_vente.trim() !== "" && isWithinLast7Days(parseTimestamp(tx.timestamp), now));
+      // Histogram for last 7 days (cumulative), compared against a stable UTC timestamp
+      const txs7d = txs.filter(tx => tx.point_de_vente && tx.point_de_vente.trim() !== "" && isWithinLast7Days(parseTimestamp(tx.timestamp), nowUTC));
       const counts7d = countDistinctTransactions(txs7d);
       const histoData = Object.entries(counts7d)
         .map(([site, count]) => ({ site, count }))
@@ -149,12 +150,12 @@ export function NatTransactionsChart() {
     };
   }, [fetchHistogram]);
 
-  const today = formatDateFR(new Date());
+  const todayUTC = formatDateUTC(new Date());
 
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="w-full h-96 bg-white rounded-lg shadow p-4 flex flex-col">
-        <h2 className="text-lg font-semibold mb-4">TOP 10 sites TPE par tentatives de transactions — {today}</h2>
+        <h2 className="text-lg font-semibold mb-4">TOP 10 sites TPE par tentatives de transactions — {todayUTC}</h2>
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center">Chargement...</div>
         ) : hasError ? (
